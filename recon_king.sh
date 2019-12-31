@@ -1,6 +1,6 @@
 #!/bin/bash
 
-passwordx=$(cat ~/tools/.creds | grep password | awk {'print $3'})
+#pass=$(cat ~/config | grep password | awk -F ' ' '{print $3}')
 
 [ ! -f ~/recon ] && mkdir ~/recon
 [ ! -f ~/recon/$1 ] && mkdir ~/recon/$1
@@ -18,8 +18,8 @@ passwordx=$(cat ~/tools/.creds | grep password | awk {'print $3'})
 sleep 5
 
 message () {
-	telegram_bot=$(cat ~/tools/.creds | grep "telegram_bot" | awk {'print $3'})
-	telegram_id=$(cat ~/tools/.creds | grep "telegram_id" | awk {'print $3'})
+	telegram_bot=$(cat ~/config | grep "telegram_bot" | awk {'print $3'})
+	telegram_id=$(cat ~/config | grep "telegram_id" | awk {'print $3'})
 	alert="https://api.telegram.org/bot$telegram_bot/sendmessage?chat_id=$telegram_id&text="
 	[ -z $telegram_bot ] && [ -z $telegram_id ] || curl -g $alert$1 --silent > /dev/null
 }
@@ -183,7 +183,7 @@ sleep 5
 
 echo "[+] MASSCAN PORT SCANNING [+]"
 if [ ! -f ~/recon/$1/$1-masscan.txt ] && [ ! -z $(which masscan) ]; then
-	echo $passwordx | sudo -S masscan -p1-65535 -iL ~/recon/$1/$1-ip.txt --max-rate 10000 -oG ~/recon/$1/$1-masscan.txt
+	echo $pass | sudo -S masscan -p1-65535 -iL ~/recon/$1/$1-ip.txt --max-rate 10000 -oG ~/recon/$1/$1-masscan.txt
 	mass=`scanned ~/recon/$1/$1-ip.txt`
 	message "Masscan%20Scanned%20$mass%20IPs%20for%20$1"
 	echo "[+] Done masscan for scanning IPs"
@@ -312,7 +312,7 @@ sleep 5
 
 echo "[+] EYEWITNESS SCREENSHOT [+]"
 if [ ! -z $(which eyewitness) ]; then
-	echo $passwordx | sudo -S eyewitness -f ~/recon/$1/$1-httprobe.txt --web --timeout 10 --no-dns --no-prompt --cycle all -d ~/recon/$1/eyewitness
+	echo $pass | sudo -S eyewitness -f ~/recon/$1/$1-httprobe.txt --web --timeout 10 --no-dns --no-prompt --cycle all -d ~/recon/$1/eyewitness
 	message "Done%20Eyewitness%20for%20Screenshot%20for%20$1"
 	echo "[+] Done eyewitness for screenshot of Alive assets"
 else
@@ -325,7 +325,7 @@ echo "[+] NMAP PORT SCANNING [+]"
 big_ports=`cat ~/recon/$1/$1-masscan.txt | grep 'Host:' | awk {'print $5'} | awk -F '/' {'print $1'} | sort -u | paste -s -d ','`
 if [ ! -f ~/recon/$1/$1-nmap.txt ] && [ ! -z $(which nmap) ]; then
 	[ ! -f ~/tools/nmap-bootstrap.xsl ] && wget "https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl" -O ~/tools/nmap-bootstrap.xsl
-	echo $passwordx | sudo -S nmap -sSVC -A -O -Pn -p$big_ports -iL ~/recon/$1/$1-ip.txt --script http-enum,http-title --stylesheet ~/tools/nmap-bootstrap.xsl -oA ~/recon/$1/$1-nmap
+	echo $pass | sudo -S nmap -sSVC -A -O -Pn -p$big_ports -iL ~/recon/$1/$1-ip.txt --script http-enum,http-title --stylesheet ~/tools/nmap-bootstrap.xsl -oA ~/recon/$1/$1-nmap
 	nmaps=`scanned ~/recon/$1/$1-ip.txt`
 	xsltproc -o ~/recon/$1/$1-nmap.html ~/tools/nmap-bootstrap.xsl ~/recon/$1/$1-nmap.xml
 	message "Nmap%20Scanned%20$nmaps%20IPs%20for%20$1"
