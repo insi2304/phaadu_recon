@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#pass=$(cat ~/config | grep password | awk -F ' ' '{print $3}')
-
 [ ! -f ~/recon ] && mkdir ~/recon
 [ ! -f ~/recon/$1 ] && mkdir ~/recon/$1
 [ ! -f ~/recon/$1/webanalyze ] && mkdir ~/recon/$1/webanalyze
@@ -222,6 +220,15 @@ fi
 sleep 5
 
 diff --new-line-format="" --unchanged-line-format="" <(cat ~/recon/$1/$1-httprobe.txt | sed 's/http:\/\///g' | sed 's/https:\/\///g' | sort) <(sort ~/recon/$1/$1-alive.txt) > ~/recon/$1/$1-diff.txt
+
+echo "[+] subzy for Subdomain TKO [+]"
+if [ ! -f ~/recon/$1/$1-subzy.txt ] && [ ! -z $(which subzy) ]; then
+	subzy -targets=recon/$1/$1-alive.txt | tee recon/$1/$1-subzy.txt
+	message "Subzy%20scanner%20done%20for%20$1"
+	echo "[+] Subzy scanner is done"
+else
+	message "[-]%20Skipping%20Subzy%20Scanning%20for%20$1"
+	echo "[!] Skipping ..."
 
 echo "[+] TKO-SUBS for Subdomain TKO [+]"
 if [ ! -f ~/recon/$1/$1-tkosubs.txt ] && [ ! -z $(which tko-subs) ]; then
