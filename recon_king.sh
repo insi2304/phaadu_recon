@@ -123,7 +123,7 @@ if [ ! -f ~/recon/$1/$1-gobuster.txt ] && [ ! -z $(which gobuster) ]; then
 	[ ! -f ~/tools/all.txt ] && wget "https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt" -O ~/tools/all.txt
 	gobuster dns -d $1 -t 100 -w ~/tools/all.txt --wildcard -o ~/recon/$1/$1-gobust.txt
 	cat ~/recon/$1/$1-gobust.txt | grep "Found:" | awk {'print $2'} > ~/recon/$1/$1-gobuster.txt
-	rm ~/recon/$1/$1-gobust.txt
+#	rm ~/recon/$1/$1-gobust.txt
 	gobusterscan=`scanned ~/recon/$1/$1-gobuster.txt`
 	message "Gobuster%20Found%20$gobusterscan%20subdomain(s)%20for%20$1"
 	echo "[+] Gobuster Found $gobusterscan subdomains"
@@ -133,9 +133,8 @@ else
 fi
 sleep 5
 
-## Deleting all the results to less disk usage
 cat ~/recon/$1/$1-amass.txt ~/recon/$1/$1-project-sonar.txt ~/recon/$1/$1-findomain.txt ~/recon/$1/$1-subfinder.txt ~/recon/$1/$1-aquatone.txt ~/recon/$1/$1-sublist3r.txt ~/recon/$1/$1-crt.txt ~/recon/$1/$1-gobuster.txt | sort -uf > ~/recon/$1/$1-final.txt
-rm ~/recon/$1/$1-amass.txt ~/recon/$1/$1-project-sonar.txt ~/recon/$1/$1-findomain.txt ~/recon/$1/$1-subfinder.txt ~/recon/$1/$1-aquatone.txt ~/recon/$1/$1-sublist3r.txt ~/recon/$1/$1-crt.txt ~/recon/$1/$1-gobuster.txt
+#rm ~/recon/$1/$1-amass.txt ~/recon/$1/$1-project-sonar.txt ~/recon/$1/$1-findomain.txt ~/recon/$1/$1-subfinder.txt ~/recon/$1/$1-aquatone.txt ~/recon/$1/$1-sublist3r.txt ~/recon/$1/$1-crt.txt ~/recon/$1/$1-gobuster.txt
 touch ~/recon/$1/$1-ipz.txt
 sleep 5
 
@@ -154,7 +153,7 @@ fi
 sleep 5
 
 cat ~/recon/$1/$1-dnsgen.txt ~/recon/$1/$1-final.txt | sed 's/\.$//g' | sort -u >> ~/recon/$1/$1-fin.txt
-rm ~/recon/$1/$1-final.txt && mv ~/recon/$1/$1-fin.txt ~/recon/$1/$1-final.txt
+#rm ~/recon/$1/$1-final.txt && mv ~/recon/$1/$1-fin.txt ~/recon/$1/$1-final.txt
 all=`scanned ~/recon/$1/$1-final.txt`
 message "Almost%20$all%20Collected%20Subdomains%20for%20$1"
 echo "[+] $all collected subdomains"
@@ -164,7 +163,7 @@ sleep 3
 ulimit -n 800000
 while read -r domain; do dig +short $domain | grep -v '[[:alpha:]]' | sort -u >> ~/recon/$1/$1-ipf.txt; done < ~/recon/$1/$1-final.txt
 cat ~/recon/$1/$1-ipf.txt | sort -u > ~/recon/$1/$1-ipz.txt
-rm ~/recon/$1/$1-ipf.txt ~/recon/$1/$1-dnsgen.txt
+#rm ~/recon/$1/$1-ipf.txt ~/recon/$1/$1-dnsgen.txt
 
 ## segregating cloudflare IP from non-cloudflare IP
 ## non-sense if I scan cloudflare IP. :(
@@ -176,7 +175,7 @@ ipz=`scanned ~/recon/$1/$1-ip.txt`
 ip_old=`scanned ~/recon/$1/$1-ipz.txt`
 message "$ipz%20non-cloudflare%20IPs%20has%20been%20$collected%20in%20$1%20out%20of%20$ip_old%20IPs"
 echo "[+] $ipz non-cloudflare IPs has been collected out of $ip_old IPs!"
-rm ~/recon/$1/$1-ipz.txt ~/recon/$1/$1-ips.txt
+#rm ~/recon/$1/$1-ipz.txt ~/recon/$1/$1-ips.txt
 sleep 5
 
 echo "[+] MASSCAN PORT SCANNING [+]"
@@ -210,7 +209,7 @@ echo "[+] Scanning Alive Hosts [+]"
 if [ ! -f ~/recon/$1/$1-alive.txt ] && [ ! -z $(which filter-resolved) ]; then
 	cat ~/recon/$1/$1-all.txt | filter-resolved >> ~/recon/$1/$1-alive.txt
 	alivesu=`scanned ~/recon/$1/$1-alive.txt`
-	rm ~/recon/$1/$1-all.txt
+#	rm ~/recon/$1/$1-all.txt
 	message "$alivesu%20alive%20domains%20out%20of%20$all%20domains%20in%20$1"
 	echo "[+] $alivesu alive domains out of $all domains/IPs using filter-resolved"
 else
@@ -248,7 +247,7 @@ if [ ! -f ~/recon/$1/$1-subjack.txt ] && [ ! -z $(which subjack) ]; then
 	subjack -w ~/recon/$1/$1-alive.txt -a -timeout 15 -c ~/tools/fingerprints.json -v -m -o ~/recon/$1/$1-subtemp.txt
 	subjack -w ~/recon/$1/$1-alive.txt -a -timeout 15 -c ~/tools/fingerprints.json -v -m -ssl -o ~/recon/$1/$1-subtmp.txt
 	cat ~/recon/$1/$1-subtemp.txt ~/recon/$1/$1-subtmp.txt | sort -u > ~/recon/$1/$1-subjack.txt
-	rm ~/recon/$1/$1-subtemp.txt ~/recon/$1/$1-subtmp.txt
+#	rm ~/recon/$1/$1-subtemp.txt ~/recon/$1/$1-subtmp.txt
 	message "subjack%20scanner%20done%20for%20$1"
 	echo "[+] Subjack scanner is done"
 else
@@ -361,7 +360,7 @@ sleep 5
 echo "[+] OTXURL Scanning for Archived Endpoints [+]"
 for u in `cat ~/recon/$1/$1-httprobe.txt | sed 's/http:\/\///g' | sed 's/https:\/\///g' | sort -u`;do echo $u | otxurls | grep "$u" >> ~/recon/$1/otxurls/tmp-$u.txt; done
 cat ~/recon/$1/otxurls/* | sort -u >> ~/recon/$1/otxurls/$1-otxurl.txt 
-rm ~/recon/$1/otxurls/tmp-*
+# rm ~/recon/$1/otxurls/tmp-*
 message "OTXURL%20Done%20for%20$1"
 echo "[+] Done otxurls for discovering useful endpoints"
 sleep 5
@@ -369,7 +368,7 @@ sleep 5
 echo "[+] WAYBACKURLS Scanning for Archived Endpoints [+]"
 for u in `cat ~/recon/$1/$1-httprobe.txt | sed 's/http:\/\///g' | sed 's/https:\/\///g' | sort -u`;do echo $u | waybackurls | grep "$u" >> ~/recon/$1/waybackurls/tmp-$u.txt; done
 cat ~/recon/$1/waybackurls/* | sort -u >> ~/recon/$1/waybackurls/$1-waybackurls.txt 
-rm ~/recon/$1/waybackurls/tmp-*
+# rm ~/recon/$1/waybackurls/tmp-*
 message "WAYBACKURLS%20Done%20for%20$1"
 echo "[+] Done waybackurls for discovering useful endpoints"
 sleep 5
@@ -382,13 +381,13 @@ if [ ! -z $(which ffuf) ]; then
 	ffuf -c -w "$path/recon/$1/$1-temp-vhost-wordlist.txt:HOSTS" -w "$path/recon/$1/$1-alive.txt:TARGETS" -u http://TARGETS -k -r -H "Host: HOSTS" -H "Cache-Control: no-transform" -mc all -fc 500-599 -of html -o ~/recon/$1/virtual-hosts/$1.txt
 	ffuf -c -w "$path/recon/$1/$1-temp-vhost-wordlist.txt:HOSTS" -w "$path/recon/$1/$1-alive.txt:TARGETS" -u https://TARGETS -k -r -H "Host: HOSTS" -H "Cache-Control: no-transform" -mc all -fc 500-599 -of html -o ~/recon/$1/virtual-hosts/$1-ssl.txt
 	message "Virtual%20Host(s)%20done%20for%20$1"
-	rm ~/recon/$1/$1-dnsgen.tmp ~/recon/$1/$1-final.tmp ~/recon/$1/$1-diff.txt
+#	rm ~/recon/$1/$1-dnsgen.tmp ~/recon/$1/$1-final.tmp ~/recon/$1/$1-diff.txt
 	echo "[+] Done ffuf for scanning virtual hosts"
 else
 	message "[-]%20Skipping%20ffuf%20for%20vhost%20scanning"
 	echo "[!] Skipping ..."
 fi
-rm ~/recon/$1/$1-temp-vhost-wordlist.txt 
+#rm ~/recon/$1/$1-temp-vhost-wordlist.txt 
 sleep 5
 
 echo "[+] DirSearch Scanning for Sensitive Files [+]"
